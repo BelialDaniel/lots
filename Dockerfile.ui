@@ -1,0 +1,10 @@
+FROM node:25-alpine3.22
+
+RUN npm install -g pnpm && apk add --no-cache bash git
+
+WORKDIR /opt/ui
+
+COPY scripts/ui.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

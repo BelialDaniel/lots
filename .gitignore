@@ -8,9 +8,12 @@ node_modules
 
 */.pnpm-store/*
 */.pnpm-store
+# React Router
 */.react-router/*
 */.react-router
+*/build/
 
+# Python
 .venv
 */.venv
 __pycache__

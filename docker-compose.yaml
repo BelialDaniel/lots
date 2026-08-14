@@ -1,7 +1,7 @@
 services:
   db:
     image: pgvector/pgvector:pg17
-    container_name: resources-db
+    container_name: realestate-management-db
     restart: on-failure
     env_file: .env
     healthcheck:
@@ -41,8 +41,8 @@ services:
     volumes:
       - ./infra/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - resources-service
-      - auth-service
+      #- resources-service
+      #- auth-service
       - users-service
 
   # ===========================================================================
@@ -107,7 +107,7 @@ services:
   # UI
   # ===========================================================================
   ui:
-    container_name: ui-lots
+    container_name: ui-management
     build:
       context: .
       dockerfile: Dockerfile.ui

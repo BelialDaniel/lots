@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -e
+
+cd /opt/users
+
 if [ ! -f "pyproject.toml" ]; then
     echo "creating toml file"
     uv init .

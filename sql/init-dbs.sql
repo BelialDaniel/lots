@@ -1,8 +1,8 @@
--- Create database for Auth Service
+-- Create database for lots, styles, plans, etc..
 CREATE DATABASE resources;
 
--- Create database for User Service
+-- Create database for Auth
 CREATE DATABASE auth;
 
--- Create database for AI Service
+-- Create database for Users
 CREATE DATABASE users;
