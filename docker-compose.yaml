@@ -1,0 +1,126 @@
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: resources-db
+    restart: on-failure
+    env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    environment:
+      PGUSER: $POSTGRES_USER
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
+    volumes:
+      - data_db:/var/lib/postgresql/data/
+      # Mount initialization script to create multiple logical databases on startup
+      - ./sql/init-dbs.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  rabbitmq:
+    env_file: .env
+    image: rabbitmq:4.3.1-management-alpine
+    container_name: rabbitmq
+    restart: on-failure
+    ports:
+      - "5672:5672"   # TCP Connection port for microservices
+      - "15672:15672"
+
+  # ===========================================================================
+  # API GATEWAY
+  # ===========================================================================
+  api-gateway:
+    image: nginx:alpine
+    container_name: api-gateway
+    ports:
+      - "8080:80"
+    volumes:
+      - ./infra/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - resources-service
+      - auth-service
+      - users-service
+
+  # ===========================================================================
+  # MICROSERVICES
+  # ===========================================================================
+  #auth-service:
+  #  container_name: auth-service
+  #  build:
+  #    context: .
+  #    dockerfile: Dockerfile.auth
+  #  env_file: .env
+  #  restart: on-failure
+  #  ports:
+  #    - "8001:8000"
+  #  volumes:
+  #    - type: bind
+  #      source: ./auth
+  #      target: /opt/auth
+  #  depends_on:
+  #    db:
+  #      condition: service_healthy
+
+  users-service:
+    container_name: users-service
+    build:
+      context: .
+      dockerfile: Dockerfile.users
+    env_file: .env
+    restart: on-failure
+    ports:
+      - "8002:8000"
+    volumes:
+      - type: bind
+        source: ./users
+        target: /opt/users
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  #resources-service:
+  #  container_name: resources-service
+  #  build:
+  #    context: .
+  #    dockerfile: Dockerfile.resources
+  #  env_file: .env
+  #  restart: on-failure
+  #  ports:
+  #    - "8003:8000"
+  #  volumes:
+  #    - type: bind
+  #      source: ./resources
+  #      target: /opt/resources
+  #  depends_on:
+  #    db:
+  #      condition: service_healthy
+  #    rabbitmq:
+  #      condition: service_started
+  
+  # ===========================================================================
+  # UI
+  # ===========================================================================
+  ui:
+    container_name: ui-lots
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    env_file: .env
+    stdin_open: true
+    tty: true
+    ports:
+      - "5173:5173"
+      - "4173:4173"
+    volumes:
+      - type: bind
+        source: ./ui
+        target: /opt/ui
+
+volumes:
+  data_db:

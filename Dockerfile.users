@@ -1,0 +1,10 @@
+FROM python:3.14-slim
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends --no-install-suggests -qq --yes \
+    curl && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/app
+
+RUN pip install uv

@@ -1,0 +1,21 @@
+[project]
+name = "users"
+version = "0.1.0"
+description = "Servise for Users information"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "alembic==1.18.4",
+    "asyncpg==0.31.0",
+    "beautifulsoup4==4.14.3",
+    "dramatiq[redis,watch]==2.1.0",
+    "fastapi[standard]==0.136.0",
+    "pwdlib[argon2]==0.3.0",
+    "pydantic-settings==2.13.1",
+    "pyjwt[crypto]==2.12.1",
+    "python-multipart==0.0.26",
+    "sqlmodel==0.0.38",
+    "boto3==1.42.91",
+    "pillow==12.1.1",
+    "pytest==9.1.1",
+]

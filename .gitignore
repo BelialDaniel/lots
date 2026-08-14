@@ -1,0 +1,24 @@
+.env
+*/.env
+
+node_modules
+*/node_modules
+
+.DS_Store
+
+*/.pnpm-store/*
+*/.pnpm-store
+*/.react-router/*
+*/.react-router
+
+.venv
+*/.venv
+__pycache__
+*/__pycache__
+
+#Planing folder
+planning/
+planning/*
+
+skills/
+skills/*
