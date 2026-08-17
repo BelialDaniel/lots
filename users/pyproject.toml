@@ -10,6 +10,7 @@ dependencies = [
     "beautifulsoup4==4.14.3",
     "dramatiq[redis,watch]==2.1.0",
     "fastapi[standard]==0.136.0",
+    "scalar-fastapi==1.8.2",
     "pwdlib[argon2]==0.3.0",
     "pydantic-settings==2.13.1",
     "pyjwt[crypto]==2.12.1",

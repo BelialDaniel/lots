@@ -42,28 +42,28 @@ services:
       - ./infra/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       #- resources-service
-      #- auth-service
+      - auth-service
       - users-service
 
   # ===========================================================================
   # MICROSERVICES
   # ===========================================================================
-  #auth-service:
-  #  container_name: auth-service
-  #  build:
-  #    context: .
-  #    dockerfile: Dockerfile.auth
-  #  env_file: .env
-  #  restart: on-failure
-  #  ports:
-  #    - "8001:8000"
-  #  volumes:
-  #    - type: bind
-  #      source: ./auth
-  #      target: /opt/auth
-  #  depends_on:
-  #    db:
-  #      condition: service_healthy
+  auth-service:
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: Dockerfile.auth
+    env_file: .env
+    restart: on-failure
+    ports:
+      - "8001:8000"
+    volumes:
+      - type: bind
+        source: ./auth
+        target: /opt/auth
+    depends_on:
+      db:
+        condition: service_healthy
 
   users-service:
     container_name: users-service
