@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
+import models  # noqa: F401
 from core.database import engine
 from sqlalchemy import text
 from fastapi import FastAPI
 from scalar_fastapi import get_scalar_api_reference
 from api.users import router as users_router
+from api.developers import router as developers_router
+from api.internal import router as internal_router
 
 
 @asynccontextmanager
@@ -24,6 +27,8 @@ app = FastAPI(
 )
 
 app.include_router(users_router)
+app.include_router(developers_router)
+app.include_router(internal_router)
 
 
 @app.get("/api/v1/users/docs", include_in_schema=False)
