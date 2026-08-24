@@ -47,8 +47,17 @@ Gateway paths:
 
 - `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
-- `GET /api/v1/auth/verify`
-- ` /api/v1/users/` (JWT required)
+- `GET /api/v1/auth/verify` — sets `X-User-Id` only (identity). No tenant in the JWT.
+- `/api/v1/users/` (JWT required)
+
+Identity vs tenant headers (the UI must not send these):
+
+| Header | Set by | When |
+| --- | --- | --- |
+| `X-User-Id` | Gateway ← `auth` `/verify` | Now |
+| `X-Tenant-Slug` | Gateway ← `Host` | Etapa 3 |
+| `X-Developer-Id` | Gateway ← `users` lookup | Etapa 4 |
+| `X-User-Role` | Gateway ← `users` lookup (`developer` \| `builder`) | Etapa 4 |
 
 ## Migrations
 

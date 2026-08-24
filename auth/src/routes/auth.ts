@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getAccessTokenFromRequest, setAccessTokenCookie } from "../core/cookie.js";
 import { HttpError } from "../core/errors.js";
+import { USER_ID_HEADER } from "../core/headers.js";
 import { loginBodySchema, registerBodySchema } from "../schemas/auth.js";
 import { loginCredential, registerCredential } from "../services/credentials.js";
 import { verifyAccessToken } from "../services/token.js";
@@ -32,6 +33,6 @@ authRouter.get("/verify", async (req, res) => {
   }
 
   const payload = await verifyAccessToken(token);
-  res.setHeader("X-User-Id", payload.sub);
+  res.setHeader(USER_ID_HEADER, payload.sub);
   res.status(200).end();
 });
