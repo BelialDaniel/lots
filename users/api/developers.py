@@ -1,4 +1,3 @@
-import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -16,10 +15,7 @@ from schemas.developers import (
 )
 from services.developers import create_developer, get_developer_by_id, get_developer_by_slug
 from services.memberships import add_membership, get_membership, list_builders
-from services.persistence import PersistenceError
 from services.users import get_user_by_email, get_user_by_id
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/users/developers", tags=["users:developers"])
 
@@ -52,11 +48,7 @@ async def create_developer_api(
         raise HTTPException(status_code=409, detail="Slug already taken")
 
     developer = Developer(slug=body.slug, owner_user_id=user_id)
-    try:
-        return await create_developer(session, developer)
-    except PersistenceError as e:
-        logger.error(f"Error creating developer: {e}")
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    return await create_developer(session, developer)
 
 
 @router.post("/{developer_id}/builders", response_model=BuilderResponse, status_code=201)
@@ -79,15 +71,10 @@ async def add_builder_api(
     if existing is not None:
         raise HTTPException(status_code=409, detail="Builder already belongs to this developer")
 
-    try:
-        await add_membership(
-            session,
-            Membership(developer_id=developer_id, builder_id=builder.id),
-        )
-    except PersistenceError as e:
-        logger.error(f"Error adding builder: {e}")
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
-
+    await add_membership(
+        session,
+        Membership(developer_id=developer_id, builder_id=builder.id),
+    )
     return builder
 
 
