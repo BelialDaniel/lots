@@ -9,7 +9,7 @@ Identity service: credentials, JWT cookie, and `/verify`. The token is **who** t
 | Header | Who sets it | This service |
 | --- | --- | --- |
 | `X-User-Id` | Gateway, from `/verify` | **Yes** — the only header `/verify` emits |
-| `X-Tenant-Slug` | Gateway, from `Host` (etapa 3) | No |
+| `X-Tenant-Slug` | Gateway, from `Host` | No |
 | `X-Developer-Id` | Gateway after `users` lookup (etapa 4) | No |
 | `X-User-Role` | Gateway after `users` lookup (`developer` \| `builder`) | No |
 

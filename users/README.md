@@ -9,7 +9,7 @@ Protected routes expect `X-User-Id` from the gateway. The UI never sends identit
 | Header | Who sets it | This service |
 | --- | --- | --- |
 | `X-User-Id` | Gateway, from `auth` `/verify` | Reads it (`api/headers.py` → `USER_ID`) |
-| `X-Tenant-Slug` | Gateway, from `Host` (etapa 3) | Lookup: `GET /api/v1/users/internal/tenants/{slug}` |
+| `X-Tenant-Slug` | Gateway, from `Host` | Receives it (`api/headers.py` → `TENANT_SLUG`). Membership lookup is etapa 4. |
 | `X-Developer-Id` | Gateway after that lookup (etapa 4) | Returns `developer_id` in the lookup body; does not set the header yet |
 | `X-User-Role` | Gateway after that lookup (`developer` \| `builder`) | Returns `TenantRole`; does not set the header yet |
 

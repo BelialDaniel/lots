@@ -38,7 +38,7 @@ docker compose up --build
 | What | URL |
 | --- | --- |
 | UI | http://localhost:5173 |
-| API gateway | http://localhost:8080 |
+| API gateway | http://localhost:8080 (also `http://<slug>.localhost:8080`) |
 | Auth service (direct) | http://localhost:8001 |
 | Users service (direct) | http://localhost:8002 |
 | RabbitMQ management | http://localhost:15672 |
@@ -48,14 +48,15 @@ Gateway paths:
 - `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
 - `GET /api/v1/auth/verify` — sets `X-User-Id` only (identity). No tenant in the JWT.
-- `/api/v1/users/` (JWT required)
+- `/api/v1/users/` (JWT required; `X-Tenant-Slug` from Host, e.g. `acme.localhost:8080`)
+- `/api/v1/users/docs` and `/api/v1/users/openapi.json` (public)
 
 Identity vs tenant headers (the UI must not send these):
 
 | Header | Set by | When |
 | --- | --- | --- |
 | `X-User-Id` | Gateway ← `auth` `/verify` | Now |
-| `X-Tenant-Slug` | Gateway ← `Host` | Etapa 3 |
+| `X-Tenant-Slug` | Gateway ← `Host` | Now |
 | `X-Developer-Id` | Gateway ← `users` lookup | Etapa 4 |
 | `X-User-Role` | Gateway ← `users` lookup (`developer` \| `builder`) | Etapa 4 |
 
