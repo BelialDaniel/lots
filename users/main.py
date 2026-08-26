@@ -8,14 +8,17 @@ from api.errors import persistence_error_handler
 from api.users import router as users_router
 from api.developers import router as developers_router
 from api.internal import router as internal_router
+from services.auth_verify import close_auth_client, init_auth_client
 from services.persistence import PersistenceError
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    init_auth_client()
     async with engine.begin() as conn:
         await conn.execute(text("SELECT 1"))
     yield
+    await close_auth_client()
 
 
 app = FastAPI(

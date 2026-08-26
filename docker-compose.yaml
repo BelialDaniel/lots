@@ -83,6 +83,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_started
+      auth-service:
+        condition: service_started
 
   #resources-service:
   #  container_name: resources-service
