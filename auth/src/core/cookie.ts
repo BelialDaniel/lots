@@ -8,6 +8,7 @@ export function setAccessTokenCookie(res: Response, accessToken: string) {
     sameSite: "lax",
     maxAge: env.JWT_EXPIRES_IN * 60 * 1000,
     path: "/",
+    ...(env.COOKIE_DOMAIN ? { domain: env.COOKIE_DOMAIN } : {}),
   });
 }
 

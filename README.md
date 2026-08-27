@@ -46,8 +46,9 @@ docker compose up --build
 Gateway paths:
 
 - `POST /api/v1/auth/register`
-- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/login` — HttpOnly cookie, host-only in local (`acme.localhost`). Prod later: `COOKIE_DOMAIN=.lots.com`.
 - `GET /api/v1/auth/verify` — sets `X-User-Id` only (identity). No tenant in the JWT.
+- `GET /api/v1/users/me` — current user (JWT required; on `<slug>.localhost` also membership)
 - `/api/v1/users/` (JWT required; on `<slug>.localhost` also membership. Headers: `X-User-Id`, `X-Tenant-Slug`, and if there is a tenant `X-Developer-Id` / `X-User-Role`)
 - `/api/v1/users/docs` and `/api/v1/users/openapi.json` (public)
 
@@ -59,6 +60,8 @@ Identity vs tenant headers (the UI must not send these):
 | `X-Tenant-Slug` | Gateway ← `Host` | Now |
 | `X-Developer-Id` | Gateway ← `users` `/internal/access` | Now (tenant Host only) |
 | `X-User-Role` | Gateway ← `users` `/internal/access` (`developer` \| `builder`) | Now (tenant Host only) |
+
+Login cookie is host-only in local (`acme.localhost`). It is not sent to `beta.localhost`; log in again on that slug. Prod later uses `COOKIE_DOMAIN=.lots.com`. The UI must not store `developer_id` in localStorage.
 
 ## Migrations
 

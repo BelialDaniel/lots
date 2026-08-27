@@ -112,7 +112,8 @@ export const openApiDocument = {
         },
         responses: {
           "200": {
-            description: "JWT issued in body and httpOnly cookie",
+            description:
+              "JWT issued in body and HttpOnly cookie. Local: host-only (acme.localhost). Prod later: COOKIE_DOMAIN=.lots.com. The cookie is identity only; tenant comes from Host.",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/LoginResponse" },

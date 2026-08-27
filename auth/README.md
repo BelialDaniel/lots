@@ -2,6 +2,8 @@
 
 Identity service: credentials, JWT cookie, and `/verify`. The token is **who** the user is (`sub`, `email`). It does **not** carry `developer_id` or a role — a builder can belong to several developers.
 
+Login sets an HttpOnly cookie. In local it is **host-only** (`acme.localhost`); `beta.localhost` does not receive it. Leave `COOKIE_DOMAIN` empty. In prod later: `COOKIE_DOMAIN=.lots.com` and `COOKIE_SECURE=true`.
+
 `GET /api/v1/auth/verify` only sets `X-User-Id` from `sub`. The gateway no longer calls this as `auth_request`. `users` `/internal/access` calls it on the Docker network, then Nginx copies identity and tenant headers onto protected routes. The UI never sends identity or tenant headers.
 
 ## Gateway headers

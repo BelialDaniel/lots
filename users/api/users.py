@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from core.database import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
-from services.users import create_user, update_user
+from services.users import create_user, get_user_by_id, update_user
 from services.profile import save_new_profile
 
 from models.users import User
@@ -13,6 +13,17 @@ from schemas.users import UserCreate, UserResponse, UserUpdate
 from api.utils import get_current_user_id
 
 router = APIRouter(prefix="/api/v1/users", tags=["users:user"])
+
+
+@router.get("/me", response_model=UserResponse)
+async def get_me(
+    user_id: uuid.UUID = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_session),
+) -> User:
+    user = await get_user_by_id(session, user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 
 @router.post("/", response_model=UserResponse)

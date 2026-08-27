@@ -4,6 +4,8 @@ Person, developer tenant (`slug`), and builder memberships. Role is **per tenant
 
 Protected routes expect `X-User-Id` from the gateway. The UI never sends identity or tenant headers.
 
+`GET /api/v1/users/me` returns the current user. Nginx still runs the membership check first: 401 without cookie, 403 if the Host slug is not this user’s tenant.
+
 The gateway does **not** call `auth` `/verify` itself. One `auth_request` hits `GET /api/v1/users/internal/access`, which calls `auth` on the Docker network and then checks owner/membership when `X-Tenant-Slug` is present.
 
 ## Gateway headers

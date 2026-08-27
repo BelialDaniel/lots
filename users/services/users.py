@@ -3,6 +3,7 @@ import uuid
 
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 from models.users import User
@@ -12,7 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 async def get_user_by_id(session: AsyncSession, user_id: uuid.UUID) -> User | None:
-    return (await session.exec(select(User).where(User.id == user_id))).first()
+    return (
+        await session.exec(
+            select(User).where(User.id == user_id).options(selectinload(User.profile))
+        )
+    ).first()
 
 
 async def get_user_by_email(session: AsyncSession, email: str) -> User | None:
