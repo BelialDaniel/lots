@@ -10,7 +10,6 @@ class Settings(BaseSettings):
 
     USERS_DB_NAME: str
     USERS_DATABASE_URL: str
-    AUTH_VERIFY_URL: str = "http://auth-service:8000/api/v1/auth/verify"
 
 
 settings = Settings()

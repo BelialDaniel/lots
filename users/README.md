@@ -4,24 +4,16 @@ Person, developer tenant (`slug`), and builder memberships. Role is **per tenant
 
 Protected routes expect `X-User-Id` from the gateway. The UI never sends identity or tenant headers.
 
-`GET /api/v1/users/me` returns the current user. Nginx still runs the membership check first: 401 without cookie, 403 if the Host slug is not this user’s tenant.
-
-The gateway does **not** call `auth` `/verify` itself. One `auth_request` hits `GET /api/v1/users/internal/access`, which calls `auth` on the Docker network and then checks owner/membership when `X-Tenant-Slug` is present.
-
 ## Gateway headers
 
 | Header | Who sets it | This service |
 | --- | --- | --- |
-| `X-User-Id` | Gateway, from `/internal/access` | Reads it on business routes (`api/headers.py` → `USER_ID`). `/internal/access` sets it after `auth` `/verify`. |
-| `X-Tenant-Slug` | Gateway, from `Host` | `/internal/access` reads it. Empty (`app.localhost`) = JWT only, no membership. |
-| `X-Developer-Id` | Gateway, from `/internal/access` | Set when the user is owner or member of that slug |
-| `X-User-Role` | Gateway, from `/internal/access` (`developer` \| `builder`) | Same |
+| `X-User-Id` | Gateway, from `auth` `/verify` | Reads it (`api/headers.py` → `USER_ID`) |
+| `X-Tenant-Slug` | Gateway, from `Host` | Receives it (`api/headers.py` → `TENANT_SLUG`). Membership lookup is etapa 4. |
+| `X-Developer-Id` | Gateway after that lookup (etapa 4) | Returns `developer_id` in the lookup body; does not set the header yet |
+| `X-User-Role` | Gateway after that lookup (`developer` \| `builder`) | Returns `TenantRole`; does not set the header yet |
 
 Names are locked in `api/headers.py`. Do not invent `X-Owner-Id`. The JWT never carries `developer_id`.
-
-`GET /internal/tenants/{slug}` remains for internal lookup (404 if the slug does not exist). It is **not** the Nginx `auth_request`. `/internal/access` returns **403** for a missing slug (Nginx would turn 404 into 500).
-
-Internal HTTP to auth: `AUTH_VERIFY_URL` (default `http://auth-service:8000/api/v1/auth/verify`).
 
 ## Migrations
 

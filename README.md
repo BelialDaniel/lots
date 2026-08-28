@@ -13,14 +13,14 @@ UI (React) ──► Nginx gateway (:8080)
                     └── /api/v1/resources → resources-service (planned)
 ```
 
-Nginx is the only public API entry point. Protected routes use one `auth_request` to `users` (`/internal/access`), which verifies the JWT with `auth` and the membership for the Host slug.
+Nginx is the only public API entry point. Protected routes ask the auth service to verify the JWT before the request is forwarded.
 
 | Service | Role | Stack |
 | --- | --- | --- |
 | **auth** | Register, login, JWT cookies, token verification | Node.js, Express, TypeScript, Drizzle, Argon2 |
 | **users** | User and profile data | Python, FastAPI, SQLModel, Alembic |
 | **ui** | Web client | React 19, React Router 8, Vite, Tailwind |
-| **api-gateway** | Routing, JWT and membership gate | Nginx |
+| **api-gateway** | Routing and JWT gate | Nginx |
 | **db** | One Postgres instance, one database per service | PostgreSQL 17 + pgvector |
 | **rabbitmq** | Async messaging between services | RabbitMQ |
 | **resources** | Lots, styles, plans *(not running yet)* | — |
@@ -46,22 +46,19 @@ docker compose up --build
 Gateway paths:
 
 - `POST /api/v1/auth/register`
-- `POST /api/v1/auth/login` — HttpOnly cookie, host-only in local (`acme.localhost`). Prod later: `COOKIE_DOMAIN=.lots.com`.
+- `POST /api/v1/auth/login`
 - `GET /api/v1/auth/verify` — sets `X-User-Id` only (identity). No tenant in the JWT.
-- `GET /api/v1/users/me` — current user (JWT required; on `<slug>.localhost` also membership)
-- `/api/v1/users/` (JWT required; on `<slug>.localhost` also membership. Headers: `X-User-Id`, `X-Tenant-Slug`, and if there is a tenant `X-Developer-Id` / `X-User-Role`)
+- `/api/v1/users/` (JWT required; `X-Tenant-Slug` from Host, e.g. `acme.localhost:8080`)
 - `/api/v1/users/docs` and `/api/v1/users/openapi.json` (public)
 
 Identity vs tenant headers (the UI must not send these):
 
 | Header | Set by | When |
 | --- | --- | --- |
-| `X-User-Id` | Gateway ← `users` `/internal/access` ← `auth` `/verify` | Now |
+| `X-User-Id` | Gateway ← `auth` `/verify` | Now |
 | `X-Tenant-Slug` | Gateway ← `Host` | Now |
-| `X-Developer-Id` | Gateway ← `users` `/internal/access` | Now (tenant Host only) |
-| `X-User-Role` | Gateway ← `users` `/internal/access` (`developer` \| `builder`) | Now (tenant Host only) |
-
-Login cookie is host-only in local (`acme.localhost`). It is not sent to `beta.localhost`; log in again on that slug. Prod later uses `COOKIE_DOMAIN=.lots.com`. The UI must not store `developer_id` in localStorage.
+| `X-Developer-Id` | Gateway ← `users` lookup | Etapa 4 |
+| `X-User-Role` | Gateway ← `users` lookup (`developer` \| `builder`) | Etapa 4 |
 
 ## Migrations
 
